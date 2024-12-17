@@ -1,4 +1,5 @@
 # requirements.txt
 
+pip install --upgrade pip
 snowflake-snowspark-python
 streamlit

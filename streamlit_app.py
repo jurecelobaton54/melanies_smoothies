@@ -12,7 +12,7 @@ st.write(
 )
 
 # Input for customer name
-name_on_order = st.text_input('Name on Smoothie:' )
+name_on_order = st.text_input('Name on Smoothie:')
 st.write('The name on your smoothie will be:', name_on_order)
 
 # Connect to Snowflake
@@ -21,18 +21,36 @@ session = cnx.session()
 
 # Ensure the order_filled column exists
 try:
-    session.sql("""
-        ALTER TABLE smoothies.public.orders ADD COLUMN order_filled BOOLEAN DEFAULT FALSE;
-    """).collect()
-except:
-    st.warning("The 'order_filled' column already exists or couldn't be added.")
+    # Query to check if the column 'order_filled' exists
+    check_column_query = """
+        SELECT * FROM information_schema.columns 
+        WHERE table_name = 'ORDERS' 
+        AND column_name = 'ORDER_FILLED';
+    """
+    
+    # Run the query
+    check_column_result = session.sql(check_column_query).collect()
+
+    # If the column is not found, add it
+    if not check_column_result:
+        session.sql("""
+            ALTER TABLE smoothies.public.orders 
+            ADD COLUMN order_filled BOOLEAN DEFAULT FALSE;
+        """).collect()
+        st.success("Column 'order_filled' was successfully added.")
+    else:
+        st.warning("The 'order_filled' column already exists.")
+
+except Exception as e:
+    st.error(f"Error while checking or adding 'order_filled' column: {e}")
 
 # Fetch fruit options from the database
 my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'), col('SEARCH_ON'))
 
 # Convert the Snowpark DataFrame to a Pandas DataFrame
-result_df = pd.DataFrame([dict(row) for row in result])  # Convert rows to dictionaries
-st.dataframe(result_df)  # Display in Streamlit
+pd_df = my_dataframe.to_pandas()
+st.dataframe(pd_df)  # Display the fruit options
+
 # Select ingredients
 ingredients_list = st.multiselect(
     'Choose up to 5 ingredients:',
@@ -40,7 +58,6 @@ ingredients_list = st.multiselect(
 )
 
 if ingredients_list:
-
     # Build the ingredients string
     ingredients_string = ', '.join(ingredients_list)
 
@@ -76,3 +93,14 @@ if ingredients_list:
             st.success(f"Your Smoothie is ordered, {name_on_order}!", icon="✅")
         except Exception as e:
             st.error(f"Failed to submit the order: {e}")
+
+# Retrieve some orders from the database to display them
+query = "SELECT * FROM smoothies.public.orders LIMIT 5;"
+orders_result = session.sql(query).collect()
+
+# Convert the result into a pandas DataFrame and display it
+if orders_result:
+    orders_df = pd.DataFrame([dict(row) for row in orders_result])  # Convert Rows to dict
+    st.dataframe(orders_df)  # Display the dataframe in Streamlit
+else:
+    st.warning("No orders found.")

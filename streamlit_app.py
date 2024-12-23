@@ -81,19 +81,19 @@ if ingredients_list:
 # Add predefined orders for Kevin, Divya, and Xi
 if st.button('Create Predefined Orders'):
     try:
-        # Kevin's order (not filled)
+        # Kevin's order
         session.sql("""
             INSERT INTO smoothies.public.orders (ingredients, name_on_order, order_filled)
             VALUES ('Apples, Lime, Ximenia', 'Kevin', FALSE);
         """).collect()
         
-        # Divya's order (filled)
+        # Divya's order
         session.sql("""
             INSERT INTO smoothies.public.orders (ingredients, name_on_order, order_filled)
             VALUES ('Dragon Fruit, Guava, Figs, Jackfruit, Blueberries', 'Divya', TRUE);
         """).collect()
         
-        # Xi's order (filled)
+        # Xi's order
         session.sql("""
             INSERT INTO smoothies.public.orders (ingredients, name_on_order, order_filled)
             VALUES ('Vanilla Fruit, Nectarine', 'Xi', TRUE);

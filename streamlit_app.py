@@ -19,7 +19,7 @@ st.write('The name on your smoothie will be:', name_on_order)
 cnx = st.connection("snowflake")
 session = cnx.session()
 
-# Ensure the `order_filled` column exists
+# Ensure the order_filled column exists
 try:
     session.sql("""
         ALTER TABLE smoothies.public.orders ADD COLUMN order_filled BOOLEAN DEFAULT FALSE;
@@ -77,28 +77,3 @@ if ingredients_list:
             st.success(f"Your Smoothie is ordered, {name_on_order}!", icon="✅")
         except Exception as e:
             st.error(f"Failed to submit the order: {e}")
-
-# Add predefined orders for Kevin, Divya, and Xi
-if st.button('Create Predefined Orders'):
-    try:
-        # Kevin's order
-        session.sql("""
-            INSERT INTO smoothies.public.orders (ingredients, name_on_order, order_filled)
-            VALUES ('Apples, Lime, Ximenia', 'Kevin', FALSE);
-        """).collect()
-        
-        # Divya's order
-        session.sql("""
-            INSERT INTO smoothies.public.orders (ingredients, name_on_order, order_filled)
-            VALUES ('Dragon Fruit, Guava, Figs, Jackfruit, Blueberries', 'Divya', TRUE);
-        """).collect()
-        
-        # Xi's order
-        session.sql("""
-            INSERT INTO smoothies.public.orders (ingredients, name_on_order, order_filled)
-            VALUES ('Vanilla Fruit, Nectarine', 'Xi', TRUE);
-        """).collect()
-        
-        st.success("Predefined orders for Kevin, Divya, and Xi have been created!", icon="✅")
-    except Exception as e:
-        st.error(f"Failed to create predefined orders: {e}")

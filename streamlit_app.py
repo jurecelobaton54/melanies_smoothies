@@ -31,9 +31,8 @@ except:
 my_dataframe = session.table("smoothies.public.fruit_options").select(col('FRUIT_NAME'), col('SEARCH_ON'))
 
 # Convert the Snowpark DataFrame to a Pandas DataFrame
-pd_df = my_dataframe.to_pandas()
-st.dataframe(pd_df)
-
+result_df = pd.DataFrame([dict(row) for row in result])  # Convert rows to dictionaries
+st.dataframe(result_df)  # Display in Streamlit
 # Select ingredients
 ingredients_list = st.multiselect(
     'Choose up to 5 ingredients:',

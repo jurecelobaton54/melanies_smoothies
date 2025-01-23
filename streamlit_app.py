@@ -24,8 +24,7 @@ try:
     # Query to check if the column 'order_filled' exists
     check_column_query = """
         SELECT * FROM information_schema.columns 
-        WHERE table_name = 'ORDERS' 
-        AND column_name = 'ORDER_FILLED';
+        WHERE table_name = 'ORDERS';
     """
     
     # Run the query
